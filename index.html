@@ -173,12 +173,12 @@
                 <div id="recommend-links-container" class="grid grid-cols-2 gap-3"></div>
             </div>
 
-            <!-- 效率与开发 (动态) -->
+            <!-- AI (原效率与开发) -->
             <div id="card-develop" class="glass-card rounded-2xl p-6 shadow-xl hover:border-purple-500/30 transition-all duration-300">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold text-purple-400 flex items-center">
-                        <i class="fas fa-code mr-2.5"></i>
-                        <span data-i18n="cardDev">效率与开发</span>
+                        <i class="fas fa-robot mr-2.5"></i>
+                        <span data-i18n="cardDev">AI</span>
                     </h3>
                     <button type="button" onclick="openLinkModal('develop')"
                             class="admin-only text-xs px-2.5 py-1 bg-purple-600/20 text-purple-400 border border-purple-500/20 rounded-lg hover:bg-purple-600/40 transition-colors cursor-pointer z-[50]">
@@ -266,7 +266,7 @@
                 themeLight: "日间", themeDark: "夜间", bgTitle: "自定义背景 (全站同步)", bgInputPlace: "输入图片网址 https://...",
                 applyBtn: "应用", clearBg: "清除壁纸", logoutBtn: "退出后台管理", weatherLoading: "正在定位测算天气...",
                 enGoogle: "谷歌 Google", enBing: "必应 Bing", enBaidu: "百度 Baidu", searchGoogle: "在 Google 中搜索...", searchBing: "在 必应 Bing 中搜索...", searchBaidu: "在 百度 Baidu 中搜索...", searchGithub: "在 GitHub 中搜索仓库...",
-                cardRec: "常用推荐", cardDev: "效率与开发", cardCustom: "站长推荐", cardFriend: "友情链接",
+                cardRec: "常用推荐", cardDev: "AI", cardCustom: "站长推荐", cardFriend: "友情链接",
                 linkBlog: "科技共享博客", linkBili: "哔哩哔哩", linkZhihu: "知乎", linkWeibo: "微博", linkJuejin: "稀土掘金",
                 addCloud: "添加", addLocal: "添加 (本地)", expandMore: "展开显示更多", collapseMore: "收起部分站点",
                 footerText: "&copy; 2026 小欧导航网 · Powered by Cloudflare", adminBadge: "已登入",
@@ -283,7 +283,7 @@
                 themeLight: "Light", themeDark: "Dark", bgTitle: "Custom Wallpaper (Cloud Sync)", bgInputPlace: "Image URL https://...",
                 applyBtn: "Apply", clearBg: "Clear Wallpaper", logoutBtn: "Logout Admin", weatherLoading: "Fetching weather...",
                 enGoogle: "Google", enBing: "Bing", enBaidu: "Baidu", searchGoogle: "Search in Google...", searchBing: "Search in Bing...", searchBaidu: "Search in Baidu...", searchGithub: "Search in GitHub...",
-                cardRec: "Recommended", cardDev: "Dev & Tools", cardCustom: "Webmaster Picks", cardFriend: "Friend Links",
+                cardRec: "Recommended", cardDev: "AI Tools", cardCustom: "Webmaster Picks", cardFriend: "Friend Links",
                 linkBlog: "TechShare Blog", linkBili: "Bilibili", linkZhihu: "Zhihu", linkWeibo: "Weibo", linkJuejin: "Juejin",
                 addCloud: "Add", addLocal: "Add (Local)", expandMore: "Show More", collapseMore: "Collapse",
                 footerText: "&copy; 2026 TechShare Smart Nav · Powered by Cloudflare", adminBadge: "Logged In",
@@ -760,7 +760,7 @@
             currentModalTarget = target;
             const textEl = document.getElementById('modal-title-text');
             if (target === 'recommend') textEl.innerText = '添加到常用推荐';
-            else if (target === 'develop') textEl.innerText = '添加到效率与开发';
+            else if (target === 'develop') textEl.innerText = '添加到AI';
             else if (target === 'friend') textEl.innerText = t('modalAddFriend');
             else if (target.startsWith('section_')) textEl.innerText = t('modalAddSection');
             else textEl.innerText = t('modalAddCloud');
@@ -819,37 +819,24 @@
             toggleModal(false);
         }
 
-        // --- 动态加载：常用推荐 & 效率与开发 ---
+        // --- 动态加载：常用推荐 & AI (原效率与开发) ---
         function loadCategoryLinks(categoryKey, containerId) {
             const container = document.getElementById(containerId);
             let links = JSON.parse(localStorage.getItem(categoryKey) || '[]');
 
+            // 默认数据已清空，只有用户自己添加的才会存储
+            // 如果 links 为空，就显示提示“暂无链接”，不再填充任何默认值
             if (links.length === 0) {
-                const defaults = {
-                    'nav_recommend_links': [
-                        { name: 'GitHub', url: 'https://github.com' },
-                        { name: 'YouTube', url: 'https://www.youtube.com/@kejigongxiang' },
-                        { name: '科技共享博客', url: 'https://kjgx668.blogspot.com' },
-                        { name: '哔哩哔哩', url: 'https://space.bilibili.com/你的UID' }, // 请替换
-                        { name: '知乎', url: 'https://www.zhihu.com' },
-                        { name: '微博', url: 'https://weibo.com' }
-                    ],
-                    'nav_develop_links': [
-                        { name: 'Cloudflare', url: 'https://dash.cloudflare.com' },
-                        { name: 'ChatGPT', url: 'https://chatgpt.com' },
-                        { name: '稀土掘金', url: 'https://juejin.cn' },
-                        { name: 'Vercel', url: 'https://vercel.com' },
-                        { name: 'StackOverflow', url: 'https://stackoverflow.com' },
-                        { name: 'CanIUse', url: 'https://caniuse.com' }
-                    ]
-                };
-                if (defaults[categoryKey]) {
-                    links = defaults[categoryKey];
-                    localStorage.setItem(categoryKey, JSON.stringify(links));
-                }
+                // 不移入默认数据，保持空状态
+                localStorage.setItem(categoryKey, JSON.stringify([]));
             }
 
             container.innerHTML = '';
+            if (links.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-xs text-slate-400/60 py-4">暂无链接</div>`;
+                return;
+            }
+
             links.forEach((item, index) => {
                 const displayName = getLocalizedLinkName(item.name, item.url);
                 let displayIcon = `<div class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0 text-[10px]">${displayName.charAt(0).toUpperCase()}</div>`;
