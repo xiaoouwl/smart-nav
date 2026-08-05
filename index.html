@@ -255,7 +255,8 @@
         let currentModalTarget = 'custom';
         let currentEngineKey = 'google';
 
-        let cloudConfig = { wallpaper: "", dynamicSections: [], adminPwd: "" };
+        // cloudConfig 增加 recommendLinks 和 developLinks 字段
+        let cloudConfig = { wallpaper: "", dynamicSections: [], adminPwd: "", recommendLinks: [], developLinks: [] };
         let dragType = null;
         let dragSecId = null;
         let dragLinkIdx = null;
@@ -432,7 +433,7 @@
             saveDynamicSections(secs);
         }
 
-        // --- 云端配置 ---
+        // --- 云端配置 (包含 recommend/develop) ---
         async function initCloudData() {
             const savedTheme = localStorage.getItem('nav_theme_mode') || 'theme-dark';
             document.body.classList.remove('theme-light', 'theme-dark');
@@ -441,17 +442,35 @@
             let savedBg = localStorage.getItem('nav_custom_wallpaper');
             cloudConfig.dynamicSections = JSON.parse(localStorage.getItem('nav_dynamic_sections') || '[]');
 
+            // 先从 localStorage 加载已有的 recommend/develop（如果有）
+            let recommendLinks = JSON.parse(localStorage.getItem('nav_recommend_links') || '[]');
+            let developLinks = JSON.parse(localStorage.getItem('nav_develop_links') || '[]');
+            cloudConfig.recommendLinks = recommendLinks;
+            cloudConfig.developLinks = developLinks;
+
             try {
                 const res = await fetch('/api/config');
                 if (res.ok) {
                     const configData = await res.json();
                     if (configData) {
+                        // 壁纸
                         if (configData.wallpaper !== undefined) {
                             if (configData.wallpaper === "") { savedBg = null; localStorage.removeItem('nav_custom_wallpaper'); document.body.classList.add('bg-cleared'); }
                             else { savedBg = configData.wallpaper; localStorage.setItem('nav_custom_wallpaper', savedBg); document.body.classList.remove('bg-cleared'); }
                         }
+                        // 动态分类
                         if (configData.dynamicSections) { cloudConfig.dynamicSections = configData.dynamicSections; localStorage.setItem('nav_dynamic_sections', JSON.stringify(cloudConfig.dynamicSections)); }
+                        // 管理员密码
                         if (configData.adminPwd) { cloudConfig.adminPwd = configData.adminPwd; }
+                        // 新增：推荐 & AI 数据
+                        if (configData.recommendLinks) {
+                            cloudConfig.recommendLinks = configData.recommendLinks;
+                            localStorage.setItem('nav_recommend_links', JSON.stringify(configData.recommendLinks));
+                        }
+                        if (configData.developLinks) {
+                            cloudConfig.developLinks = configData.developLinks;
+                            localStorage.setItem('nav_develop_links', JSON.stringify(configData.developLinks));
+                        }
                     }
                 }
             } catch (e) {}
@@ -465,9 +484,28 @@
             loadCustomLinks();
         }
 
+        // 统一云端同步函数，将 cloudConfig 所有字段 POST 到 /api/config
+        async function syncCloudConfig() {
+            try {
+                await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cloudConfig)
+                });
+            } catch (e) { console.error("云端同步失败", e); }
+        }
+
+        // 更新单个字段并同步（兼容旧代码）
         async function updateCloudConfig(key, value) {
             cloudConfig[key] = value;
-            try { await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cloudConfig) }); } catch (e) {}
+            await syncCloudConfig();
+        }
+
+        // 新增：将本地 recommend/develop 同步到 cloudConfig 并上传
+        async function syncLocalRecommendAndDevelop() {
+            cloudConfig.recommendLinks = JSON.parse(localStorage.getItem('nav_recommend_links') || '[]');
+            cloudConfig.developLinks = JSON.parse(localStorage.getItem('nav_develop_links') || '[]');
+            await syncCloudConfig();
         }
 
         function toggleThemeMenu(e) { e.stopPropagation(); document.getElementById('theme-panel').classList.toggle('hidden'); }
@@ -482,7 +520,8 @@
             document.body.classList.remove('bg-cleared');
             document.getElementById('clear-bg-btn').classList.remove('hidden');
             document.getElementById('theme-panel').classList.add('hidden');
-            updateCloudConfig('wallpaper', url);
+            cloudConfig.wallpaper = url;
+            await syncCloudConfig();
         }
 
         async function clearCustomBg() {
@@ -493,13 +532,15 @@
             document.getElementById('custom-bg-input').value = '';
             document.getElementById('clear-bg-btn').classList.add('hidden');
             document.getElementById('theme-panel').classList.add('hidden');
-            updateCloudConfig('wallpaper', "");
+            cloudConfig.wallpaper = "";
+            await syncCloudConfig();
         }
 
         // --- 动态自定义区域 ---
         function saveDynamicSections(sections) {
             localStorage.setItem('nav_dynamic_sections', JSON.stringify(sections));
-            updateCloudConfig('dynamicSections', sections);
+            cloudConfig.dynamicSections = sections;
+            syncCloudConfig(); // 同步到云端
             renderDynamicSections();
         }
 
@@ -776,7 +817,7 @@
 
         function closeModalOnBlank(e) { if (e.target.id === 'modal') toggleModal(false); }
 
-        // --- 保存链接（统一处理） ---
+        // --- 保存链接（统一处理，含云端同步） ---
         async function saveActiveLink() {
             const name = document.getElementById('site-name').value.trim();
             let url = document.getElementById('site-url').value.trim();
@@ -788,18 +829,20 @@
                 let links = JSON.parse(localStorage.getItem(categoryKey) || '[]');
                 links.push({ name, url });
                 localStorage.setItem(categoryKey, JSON.stringify(links));
+                // 同步云端
+                await syncLocalRecommendAndDevelop();
                 loadCategoryLinks(categoryKey, currentModalTarget === 'recommend' ? 'recommend-links-container' : 'develop-links-container');
             } else if (currentModalTarget.startsWith('section_')) {
                 const secId = currentModalTarget.replace('section_', '');
                 let secs = cloudConfig.dynamicSections || [];
                 const sec = secs.find(s => s.id === secId);
-                if (sec) { sec.links.push({ name, url });
-                    saveDynamicSections(secs); }
+                if (sec) { sec.links.push({ name, url }); saveDynamicSections(secs); }
             } else if (currentModalTarget === 'friend') {
                 let links = JSON.parse(localStorage.getItem('nav_friend_links') || '[]');
                 links.push({ name, url });
                 localStorage.setItem('nav_friend_links', JSON.stringify(links));
                 loadFriendLinks();
+                // 友情链接暂不同步云端，保留本地
             } else {
                 // 站长推荐（云端）
                 try {
@@ -819,15 +862,13 @@
             toggleModal(false);
         }
 
-        // --- 动态加载：常用推荐 & AI (原效率与开发) ---
+        // --- 动态加载：常用推荐 & AI ---
         function loadCategoryLinks(categoryKey, containerId) {
             const container = document.getElementById(containerId);
             let links = JSON.parse(localStorage.getItem(categoryKey) || '[]');
 
-            // 默认数据已清空，只有用户自己添加的才会存储
-            // 如果 links 为空，就显示提示“暂无链接”，不再填充任何默认值
+            // 默认无数据，不填充预设
             if (links.length === 0) {
-                // 不移入默认数据，保持空状态
                 localStorage.setItem(categoryKey, JSON.stringify([]));
             }
 
@@ -864,12 +905,14 @@
             });
         }
 
-        function deleteCategoryLink(categoryKey, index) {
+        async function deleteCategoryLink(categoryKey, index) {
             if (!confirm(t('delConfirm'))) return;
             let links = JSON.parse(localStorage.getItem(categoryKey) || '[]');
             if (index >= 0 && index < links.length) {
                 links.splice(index, 1);
                 localStorage.setItem(categoryKey, JSON.stringify(links));
+                // 同步云端
+                await syncLocalRecommendAndDevelop();
                 const containerId = categoryKey === 'nav_recommend_links' ? 'recommend-links-container' : 'develop-links-container';
                 loadCategoryLinks(categoryKey, containerId);
             }
