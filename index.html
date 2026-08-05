@@ -736,21 +736,36 @@
         function toggleExpandCustomLinks() { isCustomLinksExpanded = !isCustomLinksExpanded; loadCustomLinks(); }
         async function deleteCustomLink(e, index) { e.preventDefault(); e.stopPropagation(); if(!confirm(t('delConfirm'))) return; try { const res = await fetch('/api/links'); let links = res.ok ? await res.json() : JSON.parse(localStorage.getItem('nav_custom_links') || '[]'); links.splice(index, 1); await fetch('/api/links', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(links) }); localStorage.setItem('nav_custom_links', JSON.stringify(links)); if(links.length <= 9) isCustomLinksExpanded = false; loadCustomLinks(); } catch(error) { const links = JSON.parse(localStorage.getItem('nav_custom_links') || '[]'); links.splice(index, 1); localStorage.setItem('nav_custom_links', JSON.stringify(links)); if(links.length <= 9) isCustomLinksExpanded = false; loadCustomLinks(); } }
 
-        function loadFriendLinks() {
-            const container = document.getElementById('friend-links-container'); let linksStr = localStorage.getItem('nav_friend_links'); let links = linksStr ? JSON.parse(linksStr) : []; container.innerHTML = '';
-            if(links.length === 0) { links = [ { name: "小欧导航网", url: "#"  } ];
-            links.forEach((item, index) => {
-                const displayName = getLocalizedLinkName(item.name, item.url);
-                container.innerHTML += `
-                    <div class="group relative flex items-center justify-between p-2.5 bg-slate-500/5 border border-slate-500/10 rounded-xl hover:bg-emerald-600/10 transition-all text-center">
-                        <a href="${item.url}" draggable="false" target="_blank" rel="noopener noreferrer" class="w-full text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors truncate px-2">${displayName}</a>
-                        <button type="button" onclick="deleteFriendLink(event, ${index})" class="admin-only absolute right-1 text-[10px] text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-500/10 px-1 rounded cursor-pointer"><i class="fas fa-times"></i></button>
-                    </div>`;
-            });
-        }
-        function deleteFriendLink(e, index) { e.preventDefault(); e.stopPropagation(); let linksStr = localStorage.getItem('nav_friend_links'); let links = linksStr ? JSON.parse(linksStr) : []; if(links.length === 0) { 
+       function loadFriendLinks() {
+    const container = document.getElementById('friend-links-container'); 
+    let linksStr = localStorage.getItem('nav_friend_links'); 
+    let links = linksStr ? JSON.parse(linksStr) : []; 
+    container.innerHTML = '';
+    if(links.length === 0) { 
+        links = [ { name: "小欧导航网", url: "#" } ];   // 补全 ] 和 }
+    }
+    links.forEach((item, index) => {
+        const displayName = getLocalizedLinkName(item.name, item.url);
+        container.innerHTML += `
+            <div class="group relative flex items-center justify-between p-2.5 bg-slate-500/5 border border-slate-500/10 rounded-xl hover:bg-emerald-600/10 transition-all text-center">
+                <a href="${item.url}" draggable="false" target="_blank" rel="noopener noreferrer" class="w-full text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors truncate px-2">${displayName}</a>
+                <button type="button" onclick="deleteFriendLink(event, ${index})" class="admin-only absolute right-1 text-[10px] text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-500/10 px-1 rounded cursor-pointer"><i class="fas fa-times"></i></button>
+            </div>`;
+    });
+}
+
+function deleteFriendLink(e, index) { 
+    e.preventDefault(); 
+    e.stopPropagation(); 
+    let linksStr = localStorage.getItem('nav_friend_links'); 
+    let links = linksStr ? JSON.parse(linksStr) : []; 
+    if(links.length === 0) { 
         links = [ { name: "小欧导航网", url: "https://16888.hemorn.cn/" } ]; 
-    } links.splice(index, 1); localStorage.setItem('nav_friend_links', JSON.stringify(links)); loadFriendLinks(); }
+    } 
+    links.splice(index, 1); 
+    localStorage.setItem('nav_friend_links', JSON.stringify(links)); 
+    loadFriendLinks(); 
+}
 
         // --- 初始化运转 ---
         document.addEventListener('click', () => { document.getElementById('engine-menu').classList.add('hidden'); document.getElementById('theme-panel').classList.add('hidden'); });
