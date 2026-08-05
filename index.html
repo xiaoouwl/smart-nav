@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO 优化 -->
-    <meta name="description" content="科技共享-智能多功能响应式导航。提供高效的搜索、云端自定义网址管理、动态天气与专属壁纸等个性化功能。">
-    <meta name="keywords" content="网址导航, 科技共享, 开发者导航, 智能导航, 响应式网站, 云端同步">
+    <meta name="description" content="小欧导航网">
+    <meta name="keywords" content="小欧导航网">
     
     <title id="page-title">科技共享-智能多功能响应式导航</title>
     
@@ -269,7 +269,7 @@
 
         const i18n = {
             zh: {
-                pageTitle: "科技共享-智能多功能响应式导航", langTitle: "语言 / Language", themeTitle: "基础色彩模式 (本地偏好)",
+                pageTitle: "导航", langTitle: "语言 / Language", themeTitle: "基础色彩模式 (本地偏好)",
                 themeLight: "日间", themeDark: "夜间", bgTitle: "自定义背景 (全站同步)", bgInputPlace: "输入图片网址 https://...",
                 applyBtn: "应用", clearBg: "清除壁纸", logoutBtn: "退出后台管理", weatherLoading: "正在定位测算天气...",
                 enGoogle: "谷歌 Google", enBing: "必应 Bing", enBaidu: "百度 Baidu", searchGoogle: "在 Google 中搜索...", searchBing: "在 必应 Bing 中搜索...", searchBaidu: "在 百度 Baidu 中搜索...", searchGithub: "在 GitHub 中搜索仓库...",
@@ -740,7 +740,7 @@
 
         function loadFriendLinks() {
             const container = document.getElementById('friend-links-container'); let linksStr = localStorage.getItem('nav_friend_links'); let links = linksStr ? JSON.parse(linksStr) : []; container.innerHTML = '';
-            if(links.length === 0) { links = [ { name: "IT头条博客", url: "https://it-toutiao.blogspot.com" }, { name: "科技共享导航", url: "https://kjgx.168668520.xyz" } ]; }
+            if(links.length === 0) { links = [ { name: "小欧导航网", url: "#"  }
             links.forEach((item, index) => {
                 const displayName = getLocalizedLinkName(item.name, item.url);
                 container.innerHTML += `
