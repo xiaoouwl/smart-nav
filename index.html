@@ -88,6 +88,51 @@
         .toast-enter { animation: toastIn .22s ease-out; }
         @keyframes toastIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+        /* ==================== 手机端链接优化（安全方案二） ==================== */
+@media (max-width: 639px) {
+    /* 1. 链接名字最多显示两行，避免被完全截断 */
+    #main-nav-grid a span.font-medium {
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        white-space: normal !important;
+        line-height: 1.25 !important;
+        font-size: 11px !important;
+        word-break: break-word;
+        max-width: 100%;
+    }
+
+    /* 2. 图标稍微缩小，给文字更多空间 */
+    #main-nav-grid a i {
+        font-size: 1.15rem !important;
+        width: 1.15rem !important;
+        flex-shrink: 0;
+    }
+    #main-nav-grid a img {
+        width: 1.15rem !important;
+        height: 1.15rem !important;
+        flex-shrink: 0;
+    }
+
+    /* 3. 链接卡片内边距减小，更紧凑 */
+    #main-nav-grid .group {
+        padding: 0.5rem 0.4rem !important;
+    }
+
+    /* 4. 链接内部栅格间距缩小（不影响外层区域布局） */
+    #main-nav-grid section .grid {
+        gap: 0.5rem !important;
+    }
+
+    /* 5. 管理员模式下编辑按钮半透明常显（手机没有 hover） */
+    body.is-admin #main-nav-grid .admin-only {
+        opacity: 0.75 !important;
+    }
+    body.is-admin #main-nav-grid .group:active .admin-only {
+        opacity: 1 !important;
+    }
+}
     </style>
 </head>
 <body class="theme-dark font-sans antialiased selection:bg-indigo-500 selection:text-white">
