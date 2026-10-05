@@ -1174,50 +1174,5 @@
     }
 }
     </script>
-    <script>
-        /* ==================== 手机端链接优化（方案二） ==================== */
-@media (max-width: 639px) {
-    /* 1. 名字最多显示两行，避免被完全截断 */
-    #main-nav-grid a span {
-        display: -webkit-box !important;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        white-space: normal !important;
-        line-height: 1.25 !important;
-        font-size: 11px !important;
-        word-break: break-word;
-    }
-
-    /* 2. 图标稍微缩小，给文字腾出更多空间 */
-    #main-nav-grid a i,
-    #main-nav-grid a img {
-        width: 1.15rem !important;
-        height: 1.15rem !important;
-        font-size: 1.15rem !important;
-        flex-shrink: 0;
-    }
-
-    /* 3. 链接卡片内边距减小，整体更紧凑 */
-    #main-nav-grid .group {
-        padding: 0.5rem 0.4rem !important;
-    }
-
-    /* 4. 强制两列布局，间距更合理 */
-    #main-nav-grid .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 0.5rem !important;
-    }
-
-    /* 5. 管理员模式下编辑/删除按钮半透明常显（手机没有 hover） */
-    body.is-admin #main-nav-grid .admin-only {
-        opacity: 0.75 !important;
-    }
-    body.is-admin #main-nav-grid .group:active .admin-only,
-    body.is-admin #main-nav-grid .group:hover .admin-only {
-        opacity: 1 !important;
-    }
-}
-    </script>
 </body>
 </html>
