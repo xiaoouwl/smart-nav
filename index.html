@@ -212,6 +212,7 @@
                             <i class="fas fa-chevron-down text-xs opacity-50"></i>
                         </button>
                         <div id="engine-menu" class="absolute left-2 top-full mt-2 w-36 bg-slate-950/95 border border-slate-800 rounded-xl shadow-2xl hidden backdrop-blur-md overflow-hidden z-[110]">
+                            <button type="button" onclick="selectEngine('yandex')" class="w-full text-left px-4 py-2.5 hover:bg-indigo-600/20 text-sm flex items-center space-x-2 cursor-pointer"><i class="fas fa-search text-red-500"></i> <span data-i18n="enYandex">Yandex</span></button>
                             <button type="button" onclick="selectEngine('google')" class="w-full text-left px-4 py-2.5 hover:bg-indigo-600/20 text-sm flex items-center space-x-2 cursor-pointer"><i class="fab fa-google text-blue-400"></i> <span data-i18n="enGoogle">谷歌 Google</span></button>
                             <button type="button" onclick="selectEngine('bing')" class="w-full text-left px-4 py-2.5 hover:bg-indigo-600/20 text-sm flex items-center space-x-2 cursor-pointer"><i class="fab fa-microsoft text-teal-400"></i> <span data-i18n="enBing">必应 Bing</span></button>
                             <button type="button" onclick="selectEngine('baidu')" class="w-full text-left px-4 py-2.5 hover:bg-indigo-600/20 text-sm flex items-center space-x-2 cursor-pointer"><i class="fas fa-paw text-red-400"></i> <span data-i18n="enBaidu">百度 Baidu</span></button>
@@ -394,7 +395,7 @@
                 pageTitle: '小欧导航网', langTitle: '语言 / Language', themeTitle: '基础色彩模式 (本地偏好)',
                 themeLight: '日间', themeDark: '夜间', bgTitle: '自定义背景 (全站同步)', bgInputPlace: '输入图片网址 https://...', applyBtn: '应用', clearBg: '清除壁纸',
                 pwdTitle: '修改管理员密码 (全站同步)', pwdInputPlace: '输入新密码', saveBtn: '保存', logoutBtn: '退出后台管理', weatherLoading: '正在定位测算天气...',
-                enGoogle: '谷歌 Google', enBing: '必应 Bing', enBaidu: '百度 Baidu', searchGoogle: '在 Google 中搜索...', searchBing: '在 必应 Bing 中搜索...', searchBaidu: '在 百度 Baidu 中搜索...', searchGithub: '在 GitHub 中搜索仓库...',
+                enYandex: 'Yandex',enGoogle: '谷歌 Google', enBing: '必应 Bing', enBaidu: '百度 Baidu',searchYandex: '在 Yandex 中搜索...', searchGoogle: '在 Google 中搜索...', searchBing: '在 必应 Bing 中搜索...', searchBaidu: '在 百度 Baidu 中搜索...', searchGithub: '在 GitHub 中搜索仓库...',
                 footerText: '&copy; 2026 小欧导航网 ', adminBadge: '已登入', addSectionBtn: '添加自定义区域', addSite: '添加网站', edit: '编辑', delete: '删除',
                 expandMore: '展开显示更多', collapseMore: '收起部分站点', noCloudLinks: '暂无网站', siteName: '网站名称', siteNameEn: '英文名称（可选）', siteUrl: '网站网址 (URL)', siteIcon: '图标类名（可选）', siteIconHint: '留空将自动获取网站图标。',
                 btnCancel: '取消', btnSave: '保存站点', sectionName: '区域名称', sectionNameEn: '英文名称（可选）', sectionIcon: '区域图标', sectionColor: '主题颜色', sectionLayout: '区域宽度', linkStyle: '网站样式', layoutCard: '普通卡片', layoutWide: '整行宽卡片', styleIcon: '图标卡片', styleText: '文字链接', saveSection: '保存区域',
@@ -408,7 +409,7 @@
                 pageTitle: 'TechShare - Smart Responsive Nav', langTitle: 'Language / 语言', themeTitle: 'Color Theme (Local Pref)',
                 themeLight: 'Light', themeDark: 'Dark', bgTitle: 'Custom Wallpaper (Cloud Sync)', bgInputPlace: 'Image URL https://...', applyBtn: 'Apply', clearBg: 'Clear Wallpaper',
                 pwdTitle: 'Change Admin Password (Cloud Sync)', pwdInputPlace: 'Enter new password', saveBtn: 'Save', logoutBtn: 'Logout Admin', weatherLoading: 'Fetching weather...',
-                enGoogle: 'Google', enBing: 'Bing', enBaidu: 'Baidu', searchGoogle: 'Search in Google...', searchBing: 'Search in Bing...', searchBaidu: 'Search in Baidu...', searchGithub: 'Search GitHub repositories...',
+                enYandex: 'Yandex', enGoogle: 'Google', enBing: 'Bing', enBaidu: 'Baidu', searchGoogle: 'searchYandex: 'Search in Yandex...', Search in Google...', searchBing: 'Search in Bing...', searchBaidu: 'Search in Baidu...', searchGithub: 'Search GitHub repositories...',
                 footerText: '&copy; 2026 TechShare Smart Nav · Powered by Cloudflare', adminBadge: 'Logged In', addSectionBtn: 'Add Custom Section', addSite: 'Add Site', edit: 'Edit', delete: 'Delete',
                 expandMore: 'Show More', collapseMore: 'Collapse', noCloudLinks: 'No sites yet', siteName: 'Site Name', siteNameEn: 'English Name (Optional)', siteUrl: 'Site URL', siteIcon: 'Icon Class (Optional)', siteIconHint: 'Leave blank to fetch the website icon automatically.',
                 btnCancel: 'Cancel', btnSave: 'Save Site', sectionName: 'Section Name', sectionNameEn: 'English Name (Optional)', sectionIcon: 'Section Icon', sectionColor: 'Accent Color', sectionLayout: 'Section Width', linkStyle: 'Link Style', layoutCard: 'Standard Card', layoutWide: 'Full-width Card', styleIcon: 'Icon Cards', styleText: 'Text Links', saveSection: 'Save Section',
@@ -1119,6 +1120,7 @@
 
         // ===================== 8. 搜索、时钟、天气 =====================
         const engines = {
+            yandex: { action: 'https://yandex.com/search/', name: 'text', placeholderKey: 'searchYandex', icon: 'fas fa-search text-red-500' }
             google: { action: 'https://www.google.com/search', name: 'q', placeholderKey: 'searchGoogle', icon: 'fab fa-google text-blue-400' },
             bing: { action: 'https://cn.bing.com/search', name: 'q', placeholderKey: 'searchBing', icon: 'fab fa-microsoft text-teal-400' },
             baidu: { action: 'https://www.baidu.com/s', name: 'wd', placeholderKey: 'searchBaidu', icon: 'fas fa-paw text-red-400' },
